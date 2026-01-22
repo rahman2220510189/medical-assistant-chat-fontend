@@ -1,111 +1,89 @@
-import React, { useState } from 'react'
-import { NavLink } from 'react-router-dom';
-
+import React from 'react'
+import { NavLink } from "react-router-dom";
+import { useState } from "react";
+import { Heart, Menu, X } from "lucide-react";
 const NavBar = () => {
-    const [menuOpen, setMenuOpen] = useState(false);
+  const [isOpen, setIsOpen] = useState(false);
 
-    const navItems = [
-        { label: 'Home', path: '/' },
-        { label: 'Chatbot', path: '/chatbot' }
-    ];
+  const navLinkClass = ({ isActive }) =>
+    isActive
+      ? "text-blue-600 font-semibold"
+      : "text-gray-700 hover:text-blue-600 transition";
 
   return (
-    <nav className="navbar bg-base-100 shadow-md sticky top-0 z-50 px-2 sm:px-4 md:px-6 justify-between md:justify-center">
-      <div className="md:hidden">
-        <a className="btn btn-ghost text-lg font-bold">
-          Medical Assistant
-        </a>
-      </div>
-
-      <div className="hidden md:flex">
-        <a className="btn btn-ghost text-lg sm:text-xl md:text-2xl font-bold absolute left-2 sm:left-4 md:left-6">
-          Medical Assistant
-        </a>
-      </div>
-
-      {/* Mobile Menu Button */}
-      <div className="flex-none md:hidden">
-        <button
-          className="btn btn-square btn-ghost"
-          onClick={() => setMenuOpen(!menuOpen)}
-        >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            className="h-5 w-5"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth="2"
-              d="M4 6h16M4 12h16M4 18h16"
-            />
-          </svg>
-        </button>
-      </div>
-
-      {/* Desktop Menu - Centered */}
-      <div className="hidden md:flex justify-center">
-        <ul className="menu menu-horizontal px-1 gap-1">
-          {navItems.map((item) => (
-            <li key={item.path}>
-              <NavLink
-                to={item.path}
-                className={({ isActive }) =>
-                  `px-3 py-2 rounded-md text-sm md:text-base font-medium transition-colors ${
-                    isActive
-                      ? 'bg-primary text-primary-content'
-                      : 'hover:bg-base-200'
-                  }`
-                }
-              >
-                {item.label}
-              </NavLink>
-            </li>
-          ))}
-        </ul>
-      </div>
-
-      {/* Get Started Button - Right End */}
-      {/* <div className="flex-none hidden md:flex">
-        <button className="btn btn-primary btn-md">
+    <nav className="bg-white shadow-md fixed w-full top-0 z-50">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex justify-between items-center h-16">
           
-        </button>
-      </div> */}
+          {/* Logo */}
+          <NavLink to="/" className="flex items-center space-x-2">
+            <div className="bg-blue-600 p-2 rounded-lg">
+              <Heart className="w-6 h-6 text-white" />
+            </div>
+            <span className="text-xl font-bold text-gray-800">
+              MediCare<span className="text-blue-600">Plus</span>
+            </span>
+          </NavLink>
 
-      {/* Mobile Menu Dropdown */}
-      {menuOpen && (
-        <div className="absolute top-full left-0 right-0 md:hidden bg-base-100 shadow-lg border-t border-base-300">
-          <ul className="menu w-full p-4 gap-2">
-            {navItems.map((item) => (
-              <li key={item.path}>
-                <NavLink
-                  to={item.path}
-                  onClick={() => setMenuOpen(false)}
-                  className={({ isActive }) =>
-                    `px-4 py-2 rounded-md text-base font-medium transition-colors ${
-                      isActive
-                        ? 'bg-primary text-primary-content'
-                        : 'hover:bg-base-200'
-                    }`
-                  }
-                >
-                  {item.label}
-                </NavLink>
-              </li>
-            ))}
-          </ul>
-          {/* <div className="px-4 pb-4">
-            <button className="btn btn-primary w-full">
-              
-            </button>
-          </div> */}
+          {/* Desktop Navigation */}
+          <div className="hidden md:flex items-center space-x-8">
+            <NavLink to="/" className={navLinkClass}>Home</NavLink>
+            <NavLink to="/services" className={navLinkClass}>Services</NavLink>
+            <NavLink to="/doctors" className={navLinkClass}>Doctors</NavLink>
+            <NavLink to="/appointments" className={navLinkClass}>Appointments</NavLink>
+            <NavLink to="/about" className={navLinkClass}>About</NavLink>
+            <NavLink to="/chatbot" className={navLinkClass}>Chatbot</NavLink>
+
+            <NavLink to="/contact" className={navLinkClass}>Contact</NavLink>
+          </div>
+
+          {/* Auth Buttons */}
+          <div className="hidden md:flex items-center space-x-4">
+            <NavLink to="/login" className="text-blue-600 hover:text-blue-700 font-medium transition">
+              Login
+            </NavLink>
+            <NavLink
+              to="/register"
+              className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition"
+            >
+              Register
+            </NavLink>
+          </div>
+
+          {/* Mobile Menu Button */}
+          <button onClick={() => setIsOpen(!isOpen)} className="md:hidden">
+            {isOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+          </button>
+        </div>
+      </div>
+
+      {/* Mobile Navigation */}
+      {isOpen && (
+        <div className="md:hidden bg-white border-t">
+          <div className="px-4 pt-2 pb-4 space-y-2">
+            <NavLink to="/" className={navLinkClass}>Home</NavLink>
+            <NavLink to="/services" className={navLinkClass}>Services</NavLink>
+            <NavLink to="/doctors" className={navLinkClass}>Doctors</NavLink>
+            <NavLink to="/appointments" className={navLinkClass}>Appointments</NavLink>
+            <NavLink to="/about" className={navLinkClass}>About</NavLink>
+            <NavLink to="/contact" className={navLinkClass}>Contact</NavLink>
+
+            <NavLink to="/login" className="block py-2 text-blue-600 font-medium">
+              Login
+            </NavLink>
+            <NavLink
+              to="/register"
+              className="block bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700"
+            >
+              Register
+            </NavLink>
+          </div>
         </div>
       )}
     </nav>
-  )
-}
+  );
+};
+ 
+
 
 export default NavBar

@@ -1,9 +1,15 @@
 import React from 'react'
 import NavBar from '../NavBar/NavBar'
-import { Outlet } from 'react-router-dom'
+import { Outlet, useLocation } from 'react-router-dom'
 import Footer from '../Footer/Footer'
 
 const Main = () => {
+  const location = useLocation();
+  const hideLayoutForPaths = ['chatbot'];
+  const shouldHideLayout = hideLayoutForPaths.includes(location.pathname.slice(1));
+  if (shouldHideLayout) {
+    return <Outlet></Outlet>;
+  }
   return (
     <div>
       <NavBar>
