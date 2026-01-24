@@ -1,4 +1,4 @@
-import React from 'react'
+import React from "react";
 import { NavLink } from "react-router-dom";
 import { useState } from "react";
 import { Heart, Menu, X } from "lucide-react";
@@ -14,32 +14,55 @@ const NavBar = () => {
     <nav className="bg-white shadow-md fixed w-full top-0 z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
-          
           {/* Logo */}
-          <NavLink to="/" className="flex items-center space-x-2">
-            <div className="bg-blue-600 p-2 rounded-lg">
-              <Heart className="w-6 h-6 text-white" />
-            </div>
-            <span className="text-xl font-bold text-gray-800">
-              MediCare<span className="text-blue-600">Plus</span>
-            </span>
-          </NavLink>
+         <NavLink to="/" className="flex items-center space-x-3">
+  <div className="bg-blue-600 p-2 rounded-lg">
+    <Heart className="w-7 h-7 text-white" />
+  </div>
+
+  <div className="leading-tight">
+    <span className="text-xl font-bold text-gray-800">
+      MediCare<span className="text-blue-600">Plus</span>
+    </span>
+    <p className="text-xs text-gray-500">
+      Smart Healthcare. Powered by AI.
+    </p>
+  </div>
+</NavLink>
+
 
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center space-x-8">
-            <NavLink to="/" className={navLinkClass}>Home</NavLink>
-            <NavLink to="/services" className={navLinkClass}>Services</NavLink>
-            <NavLink to="/doctors" className={navLinkClass}>Doctors</NavLink>
-            <NavLink to="/appointments" className={navLinkClass}>Appointments</NavLink>
-            <NavLink to="/about" className={navLinkClass}>About</NavLink>
-            <NavLink to="/chatbot" className={navLinkClass}>Chatbot</NavLink>
+            <NavLink to="/" className={navLinkClass}>
+              Home
+            </NavLink>
+            <NavLink to="/services" className={navLinkClass}>
+              Services
+            </NavLink>
+            <NavLink to="/doctors" className={navLinkClass}>
+              Doctors
+            </NavLink>
+            <NavLink to="/appointments" className={navLinkClass}>
+              Appointments
+            </NavLink>
+            <NavLink to="/about" className={navLinkClass}>
+              About
+            </NavLink>
+            <NavLink to="/chatbot" className={navLinkClass}>
+              Chatbot
+            </NavLink>
 
-            <NavLink to="/contact" className={navLinkClass}>Contact</NavLink>
+            <NavLink to="/contact" className={navLinkClass}>
+              Contact
+            </NavLink>
           </div>
 
           {/* Auth Buttons */}
           <div className="hidden md:flex items-center space-x-4">
-            <NavLink to="/login" className="text-blue-600 hover:text-blue-700 font-medium transition">
+            <NavLink
+              to="/login"
+              className="text-blue-600 hover:text-blue-700 font-medium transition"
+            >
               Login
             </NavLink>
             <NavLink
@@ -61,14 +84,29 @@ const NavBar = () => {
       {isOpen && (
         <div className="md:hidden bg-white border-t">
           <div className="px-4 pt-2 pb-4 space-y-2">
-            <NavLink to="/" className={navLinkClass}>Home</NavLink>
-            <NavLink to="/services" className={navLinkClass}>Services</NavLink>
-            <NavLink to="/doctors" className={navLinkClass}>Doctors</NavLink>
-            <NavLink to="/appointments" className={navLinkClass}>Appointments</NavLink>
-            <NavLink to="/about" className={navLinkClass}>About</NavLink>
-            <NavLink to="/contact" className={navLinkClass}>Contact</NavLink>
+            <NavLink to="/" className={navLinkClass}>
+              Home
+            </NavLink>
+            <NavLink to="/services" className={navLinkClass}>
+              Services
+            </NavLink>
+            <NavLink to="/doctors" className={navLinkClass}>
+              Doctors
+            </NavLink>
+            <NavLink to="/appointments" className={navLinkClass}>
+              Appointments
+            </NavLink>
+            <NavLink to="/about" className={navLinkClass}>
+              About
+            </NavLink>
+            <NavLink to="/contact" className={navLinkClass}>
+              Contact
+            </NavLink>
 
-            <NavLink to="/login" className="block py-2 text-blue-600 font-medium">
+            <NavLink
+              to="/login"
+              className="block py-2 text-blue-600 font-medium"
+            >
               Login
             </NavLink>
             <NavLink
@@ -83,7 +121,5 @@ const NavBar = () => {
     </nav>
   );
 };
- 
 
-
-export default NavBar
+export default NavBar;
