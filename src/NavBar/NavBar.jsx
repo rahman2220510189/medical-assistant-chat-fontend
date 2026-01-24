@@ -1,10 +1,18 @@
-import React from "react";
-import { NavLink } from "react-router-dom";
+import React, { useContext } from "react";
+import { Link, NavLink } from "react-router-dom";
 import { useState } from "react";
 import { Heart, Menu, X } from "lucide-react";
+import { AuthContext } from "../Provider/AuthProvider";
 const NavBar = () => {
   const [isOpen, setIsOpen] = useState(false);
-
+  const {user, logOut} = useContext(AuthContext);
+  const handleLogOut = () =>{
+    logOut()
+    .then(()=>{
+      console.log('logged out successfully');
+    })
+    .catch(error => console.log(error));
+  }
   const navLinkClass = ({ isActive }) =>
     isActive
       ? "text-blue-600 font-semibold"
@@ -59,18 +67,29 @@ const NavBar = () => {
 
           {/* Auth Buttons */}
           <div className="hidden md:flex items-center space-x-4">
-            <NavLink
-              to="/login"
-              className="text-blue-600 hover:text-blue-700 font-medium transition"
-            >
-              Login
-            </NavLink>
-            <NavLink
-              to="/register"
-              className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition"
-            >
-              Register
-            </NavLink>
+           
+            {user ? (
+              <button onClick={handleLogOut} className="text-red-600 hover:text-red-700 font-medium transition">
+                Logout
+              </button>
+            ) : (
+              <>
+                <Link
+                  to="/login"
+                  state={{from: location}}replace
+                  className="text-blue-600 hover:text-blue-700 font-medium transition"
+                >
+                  Login
+                </Link>
+                <Link
+                  to="/register"
+                  state={{from: location}}replace
+                  className="block bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700"
+                >
+                  Register
+                </Link>
+              </>
+            )}
           </div>
 
           {/* Mobile Menu Button */}
@@ -103,18 +122,28 @@ const NavBar = () => {
               Contact
             </NavLink>
 
-            <NavLink
-              to="/login"
-              className="block py-2 text-blue-600 font-medium"
-            >
-              Login
-            </NavLink>
-            <NavLink
-              to="/register"
-              className="block bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700"
-            >
-              Register
-            </NavLink>
+            {user ? (
+              <button onClick={handleLogOut} className="text-red-600 hover:text-red-700 font-medium transition">
+                Logout
+              </button>
+            ) : (
+              <>
+                <Link
+                  to="/login"
+                  state={{from: location}}replace
+                  className="text-blue-600 hover:text-blue-700 font-medium transition"
+                >
+                  Login
+                </Link>
+                <Link
+                  to="/register"
+                  state={{from: location}}replace
+                  className="block bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700"
+                >
+                  Register
+                </Link>
+              </>
+            )}
           </div>
         </div>
       )}
