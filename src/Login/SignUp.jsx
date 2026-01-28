@@ -1,19 +1,34 @@
 import React, { useState, useContext } from "react"; // Added imports
 import { Link, useNavigate } from "react-router-dom";
 import { AuthContext } from "../Provider/AuthProvider";
+import useAxiosPublic from "../Hooks/useAxiosPublic";
 
 const SignUp = () => {
     const [showPassword, setShowPassword] = useState(false);
     const [error, setError] = useState('');
     const navigate = useNavigate();
     const { createUser, googleSignIn } = useContext(AuthContext);
+    const axiosPublic = useAxiosPublic();
 
     // Function to toggle password eye icon
     const togglePasswordVisibility = () => {
         setShowPassword(!showPassword);
     };
 
-    const handleSubmit = (e) => {
+    //generate jwt token
+    const generateToken = async (email) => {
+        try{
+            const res = await axiosPublic.post('/jwt', {email});
+            if(res.data?.token){
+                localStorage.setItem('access-token', res.data.token);
+                console.log('token stored successfully');
+            }
+        } catch(err){
+            console.error('Error generating token:', err);
+        }
+    };
+
+    const handleSubmit = async (e) => {
         e.preventDefault();
         setError(''); // Clear previous errors
         
@@ -27,30 +42,58 @@ const SignUp = () => {
             setError('Password must be at least 6 characters long.');
             return;
         }
+        
+        
 
-        createUser(email, password)
-            .then(result => {
-                const createdUser = result.user;
-                console.log("User Created:", createdUser);
+
+
+     try{
+
+     
+       const result = await createUser(email, password);
+            const user = result.user;
+            console.log("Created User:", user);
+            await generateToken(user.email);
+
+            //save user to mongoDB
+            const userInfo = {
+                email: user.email,
+                name: name || email.split('@')[0],
+            }
+            const dbResponse = await axiosPublic.post('/api/users', userInfo);
+            console.log('User saved to DB:', dbResponse.data);
+
                 form.reset();
                 navigate('/');
-            })
-            .catch(err => {
-                console.error(err);
+            } catch (err) {
+                console.error('Error creating user:', err);
                 setError(err.message);
-            });
+            }
     };
 
-    const handleGoogleSignIn = () => {
-        googleSignIn()
-            .then(result => {
-                console.log("Google User:", result.user);
-                navigate('/');
-            })
-            .catch(err => {
-                console.error(err);
-                setError(err.message);
-            });
+           
+
+    const handleGoogleSignIn = async() => {
+     try{ 
+        const result = await googleSignIn();
+            console.log("Google User:", result.user);
+            await generateToken(result.user.email);
+
+            //save user to mongoDB
+            const userInfo = {
+                email: result.user.email,
+                name: result.user.displayName,
+            }
+            const dbResponse = await axiosPublic.post('/api/users', userInfo);
+            console.log('Google User saved to DB:', dbResponse.data);
+            navigate('/');
+        } 
+        catch(err){
+            console.error('Error with Google Sign-In:', err);
+            setError(err.message);
+        }
+
+      
     };
 
     return (

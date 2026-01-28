@@ -1,10 +1,13 @@
 import React, { useContext } from "react";
 import { Link, NavLink } from "react-router-dom";
 import { useState } from "react";
+import { useLocation } from "react-router-dom";
+
 import { Heart, Menu, X } from "lucide-react";
 import { AuthContext } from "../Provider/AuthProvider";
 const NavBar = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const location = useLocation();
   const {user, logOut} = useContext(AuthContext);
   const handleLogOut = () =>{
     logOut()
