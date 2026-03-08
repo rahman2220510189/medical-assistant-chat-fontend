@@ -16,11 +16,12 @@ import SignUp from '../Login/SignUp'
 import Dashboard from '../Admin/Dashboard'
 import AdminDoctors from '../Admin/AdminDoctors'
 import AdminAppointments from '../Admin/AdminAppointments'
-import AdminPatients from '../Admin/AdminPatients'
+
 import AdminSettings from '../Admin/AdminSettings'
 import AdminLayout from '../Admin/AdminLayout'
 import AdminRoute from './AdminRoute'
 import PrivateRoute from './PrivateRoute'
+import AdminPatients from '../Admin/AdminPatients'
 
 export const router = createBrowserRouter([
     // ── PUBLIC ROUTES ──
