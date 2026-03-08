@@ -5,7 +5,7 @@ import Footer from '../Footer/Footer'
 
 const Main = () => {
   const location = useLocation();
-  const hideLayoutForPaths = ['chatbot', 'login', 'signup'];
+  const hideLayoutForPaths = ['chatbot', 'login', 'register'];
   const shouldHideLayout = hideLayoutForPaths.includes(location.pathname.slice(1));
   if (shouldHideLayout) {
     return <Outlet></Outlet>;
