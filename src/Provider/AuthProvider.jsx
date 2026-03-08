@@ -1,5 +1,5 @@
 import { createContext, useEffect, useState } from "react";
-import { createUserWithEmailAndPassword, getAuth, onAuthStateChanged, sendPasswordResetEmail, signInWithEmailAndPassword, signInWithPopup, signOut } from "firebase/auth";
+import { createUserWithEmailAndPassword, getAuth, onAuthStateChanged, sendPasswordResetEmail, signInWithEmailAndPassword, signInWithPopup, signInWithRedirect, signOut } from "firebase/auth";
 import { GoogleAuthProvider } from "firebase/auth";
 import { app } from "./firebase.js";
 const provider = new GoogleAuthProvider();
@@ -20,9 +20,18 @@ const signIn = (email, password) =>{
     return signInWithEmailAndPassword(auth, email, password);
 
 };
-const googleSignIn = () =>{
+const googleSignIn = async () =>{
     setLoading(true);
-    return signInWithPopup(auth, provider)
+
+    try {
+        return await signInWithPopup(auth, provider);
+    } catch (error) {
+        // Some browsers block popups; fall back to redirect flow
+        if (error.code === 'auth/popup-blocked' || error.code === 'auth/popup-closed-by-user') {
+            return signInWithRedirect(auth, provider);
+        }
+        throw error;
+    }
 };
 const resetPassword =(email) =>{
     return sendPasswordResetEmail(auth, email);

@@ -1,47 +1,65 @@
 import React, { useState, useContext } from "react";
-import { useNavigate, Link } from "react-router-dom"; 
+import { useNavigate, Link } from "react-router-dom";
 import { AuthContext } from "../Provider/AuthProvider";
+import useAxiosPublic from "../Hooks/useAxiosPublic";   // ← যোগ করা
 
 const Login = () => {
     const [showPassword, setShowPassword] = useState(false);
     const [error, setError] = useState('');
     const navigate = useNavigate();
-    const { signIn, googleSignIn } = useContext(AuthContext); 
+    const { signIn, googleSignIn } = useContext(AuthContext);
+    const axiosPublic = useAxiosPublic();                // ← যোগ করা
 
     const togglePasswordVisibility = () => {
         setShowPassword(!showPassword);
     };
 
-    const handleLogin = (e) => {
+    // ── JWT token generate & save ── (যোগ করা)
+    const generateToken = async (email) => {
+        try {
+            const res = await axiosPublic.post('/jwt', { email });
+            if (res.data?.token) {
+                localStorage.setItem('access-token', res.data.token);
+                console.log('token stored successfully');
+            }
+        } catch (err) {
+            console.error('Error generating token:', err);
+        }
+    };
+
+    // ── Email/Password login ──
+    const handleLogin = async (e) => {
         e.preventDefault();
         setError('');
-        
+
         const form = e.target;
         const email = form.email.value;
         const password = form.password.value;
 
-        signIn(email, password)
-            .then(result => {
-                console.log("Logged In:", result.user);
-                form.reset();
-                navigate('/'); // Navigate to home or dashboard
-            })
-            .catch(err => {
-                console.error(err);
-                setError("Invalid email or password. Please try again.");
-            });
+        try {
+            const result = await signIn(email, password);
+            console.log("Logged In:", result.user);
+            await generateToken(result.user.email);     // ← যোগ করা
+            form.reset();
+            navigate('/');
+        } catch (err) {
+            console.error(err);
+            setError("Invalid email or password. Please try again.");
+        }
     };
 
-    const handleGoogleSignIn = () => {
-        googleSignIn()
-            .then(result => {
-                console.log("Google Login:", result.user);
-                navigate('/');
-            })
-            .catch(err => {
-                console.error(err);
-                setError(err.message);
-            });
+    // ── Google login ──
+    const handleGoogleSignIn = async () => {
+        try {
+            const result = await googleSignIn();
+            if (!result?.user) return; // redirect এ গেলে null আসে
+            console.log("Google Login:", result.user);
+            await generateToken(result.user.email);     // ← যোগ করা
+            navigate('/');
+        } catch (err) {
+            console.error(err);
+            setError(err.message);
+        }
     };
 
     return (
@@ -52,9 +70,9 @@ const Login = () => {
             </div>
 
             {/* Google Sign-In */}
-            <button 
-                type="button" 
-                onClick={handleGoogleSignIn} 
+            <button
+                type="button"
+                onClick={handleGoogleSignIn}
                 className="w-full flex items-center justify-center gap-2 border border-gray-300 p-2.5 rounded-lg hover:bg-gray-50 transition mb-6 shadow-sm"
             >
                 <img src="https://www.svgrepo.com/show/355037/google.svg" className="w-5 h-5" alt="Google" />
@@ -68,14 +86,12 @@ const Login = () => {
             </div>
 
             <form onSubmit={handleLogin} className="space-y-4">
-                {/* Error Message */}
                 {error && (
                     <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-2 rounded-lg text-sm text-center">
                         {error}
                     </div>
                 )}
 
-                {/* Email Input */}
                 <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">Email Address</label>
                     <input
@@ -87,7 +103,6 @@ const Login = () => {
                     />
                 </div>
 
-                {/* Password Input */}
                 <div>
                     <div className="flex justify-between items-center mb-1">
                         <label className="text-sm font-medium text-gray-700">Password</label>
@@ -115,9 +130,8 @@ const Login = () => {
                     </div>
                 </div>
 
-                {/* Submit Button */}
-                <button 
-                    type="submit" 
+                <button
+                    type="submit"
                     className="w-full bg-blue-600 text-white p-2.5 rounded-lg font-semibold hover:bg-blue-700 transition shadow-lg shadow-blue-100 mt-2"
                 >
                     Sign In
@@ -125,8 +139,8 @@ const Login = () => {
             </form>
 
             <p className="text-center text-sm text-gray-600 mt-8">
-                Don't have an account? {" "}
-                <Link to="/signup" className="text-blue-600 font-semibold hover:underline">
+                Don't have an account?{" "}
+                <Link to="/register" className="text-blue-600 font-semibold hover:underline">
                     Create one for free
                 </Link>
             </p>
