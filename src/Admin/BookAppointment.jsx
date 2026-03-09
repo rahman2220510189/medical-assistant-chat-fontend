@@ -29,7 +29,7 @@ function getDayName(year, month, day) {
   return ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"][new Date(year, month, day).getDay()];
 }
 
-function BookAppointment() {
+export default function BookAppointment() {
   const { doctorId } = useParams();
   const navigate = useNavigate();
 
@@ -63,10 +63,18 @@ function BookAppointment() {
     if (!selectedDate) return;
     const fetchBooked = async () => {
       try {
-        const res = await axios.get(`${API}/api/doctors/${doctorId}/availability`, {
-          params: { date: selectedDate }
+        const res = await axios.get(`${API}/api/appointments/my`, {
+          headers: { Authorization: `Bearer ${token}` }
         });
-        setBookedSlots(res.data.bookedSlots || []);
+        // filter appointments for this doctor + date that are Pending/Confirmed
+        const booked = (res.data.appointments || [])
+          .filter(a =>
+            a.doctorId === doctorId &&
+            a.appointmentDate?.startsWith(selectedDate) &&
+            ["Pending","Confirmed"].includes(a.status)
+          )
+          .map(a => a.appointmentTime);
+        setBookedSlots(booked);
       } catch { setBookedSlots([]); }
     };
     fetchBooked();
@@ -797,5 +805,3 @@ function BookAppointment() {
     </>
   );
 }
-
-export default BookAppointment;
