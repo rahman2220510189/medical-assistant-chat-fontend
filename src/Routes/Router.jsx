@@ -22,6 +22,7 @@ import AdminLayout from '../Admin/AdminLayout'
 import AdminRoute from './AdminRoute'
 import PrivateRoute from './PrivateRoute'
 import AdminPatients from '../Admin/AdminPatients'
+import BookAppointment from '../Admin/BookAppointment'
 
 export const router = createBrowserRouter([
     // ── PUBLIC ROUTES ──
@@ -53,6 +54,10 @@ export const router = createBrowserRouter([
                 path: '/register',
                 element: <SignUp></SignUp>
             },
+            {
+                path:'appointments/book/:doctorId',
+                element: <PrivateRoute><BookAppointment></BookAppointment></PrivateRoute>
+            }
         ],
     },
 
