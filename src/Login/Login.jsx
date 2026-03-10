@@ -144,6 +144,18 @@ const Login = () => {
                     Create one for free
                 </Link>
             </p>
+            <div className="relative flex items-center my-4">
+    <div className="flex-grow border-t border-gray-200"></div>
+    <span className="flex-shrink mx-4 text-gray-400 text-xs uppercase tracking-wider">or</span>
+    <div className="flex-grow border-t border-gray-200"></div>
+</div>
+
+<Link
+    to="/doctor/login"
+    className="w-full flex items-center justify-center gap-2 border border-blue-200 p-2.5 rounded-lg hover:bg-blue-50 transition text-blue-600 font-medium text-sm"
+>
+    🩺 Doctor Login
+</Link>
         </div>
     );
 };

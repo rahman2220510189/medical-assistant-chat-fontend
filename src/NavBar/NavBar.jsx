@@ -584,12 +584,12 @@ const NavBar = () => {
         }
       `}</style>
 
-      {/* admin-mode class যোগ হবে isAdmin হলে */}
+      {/* admin-mode class  isAdmin  */}
       <nav className={`nav-root ${scrolled ? "scrolled" : ""} ${isAdmin ? "admin-mode" : ""}`}>
         <div className="nav-inner">
           <div className="nav-content">
 
-            {/* ── LOGO ── admin হলে /admin এ যাবে */}
+            {/* ── LOGO ── admin /admin  */}
             <NavLink to={isAdmin ? "/admin" : "/"} className="logo-wrap">
               <div className="logo-icon">
                 <div className="logo-pulse">
