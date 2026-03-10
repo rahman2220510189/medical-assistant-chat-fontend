@@ -29,6 +29,9 @@ import DoctorAppointments from '../../Pages/DoctorAppointments'
 import DoctorProfile from '../../Pages/DoctorProfil'
 import VideoCall from '../../Pages/VideoCall'
 import Prescription from '../../Pages/Prescription'
+import About from '../../Pages/About'
+import Contact from "../../Pages/Contact";
+import Services from "../../Pages/Services";
 
 export const router = createBrowserRouter([
     // ── PUBLIC ROUTES ──
@@ -69,7 +72,16 @@ export const router = createBrowserRouter([
                 element:<DoctorLogin></DoctorLogin>
             },
             { path: "/prescription/:appointmentId",
-            element: <PrivateRoute><Prescription /></PrivateRoute> },
+            element: <PrivateRoute><Prescription /></PrivateRoute>
+         },
+         { path: "/about", 
+            element: <About /> 
+        },
+            { path: "/contact",
+            element: <Contact /> },
+            { path: "/services", 
+            element: <Services /> 
+        },
            
         ],
     },
