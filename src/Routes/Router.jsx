@@ -23,6 +23,8 @@ import AdminRoute from './AdminRoute'
 import PrivateRoute from './PrivateRoute'
 import AdminPatients from '../Admin/AdminPatients'
 import BookAppointment from '../Admin/BookAppointment'
+import DoctorLogin from '../../Pages/DoctorLogin'
+import DoctorDashboard, { DoctorLayout, DoctorRoute } from '../../Pages/DoctorDashboard'
 
 export const router = createBrowserRouter([
     // ── PUBLIC ROUTES ──
@@ -57,9 +59,25 @@ export const router = createBrowserRouter([
             {
                 path:'appointments/book/:doctorId',
                 element: <PrivateRoute><BookAppointment></BookAppointment></PrivateRoute>
-            }
+            },
+            {
+                path: "/doctor/login",
+                element:<DoctorLogin></DoctorLogin>
+            },
+           
         ],
     },
+
+     {
+        path: "/doctor/dashboard",
+        element:<DoctorRoute><DoctorLayout></DoctorLayout></DoctorRoute>,
+        children: [
+            {
+                index: true,
+                element: <DoctorDashboard></DoctorDashboard>
+            }
+        ]
+     },
 
     // ── ADMIN ROUTES ──
     {

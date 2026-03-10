@@ -18,7 +18,7 @@ const TIME_SLOTS = [
 ];
 const defaultForm = {
   name:"",email:"",phone:"",specialist:"",experience:"",
-  consultationFee:"",about:"",qualifications:"",availability:[],
+  consultationFee:"",about:"",qualifications:"",availability:[],password:"",
 };
 
 // ─── Portal Modal — renders into document.body, above everything ───
@@ -116,6 +116,7 @@ export default function AdminDoctors() {
       consultationFee: doc.consultationFee||"", about: doc.about||"",
       qualifications: (doc.qualifications||[]).join(", "),
       availability: doc.availability||[],
+      password: "",
     });
     setPhotoPreview(doc.photo||null); setPhotoFile(null); setShowModal(true);
   };
@@ -320,6 +321,20 @@ export default function AdminDoctors() {
                   <div><label style={lbl}>Consultation Fee (৳)</label><input type="number" min="0" style={inp} placeholder="500" value={form.consultationFee} onChange={e=>setForm({...form,consultationFee:e.target.value})} /></div>
                   <div style={{ gridColumn:"1/-1" }}><label style={lbl}>Qualifications (comma separated)</label><input style={inp} placeholder="MBBS, MD, FCPS" value={form.qualifications} onChange={e=>setForm({...form,qualifications:e.target.value})} /></div>
                   <div style={{ gridColumn:"1/-1" }}><label style={lbl}>About</label><textarea style={{ ...inp, resize:"vertical", minHeight:80 }} placeholder="Brief description..." value={form.about} onChange={e=>setForm({...form,about:e.target.value})} /></div>
+
+                  {/* ✅ Password field */}
+                  <div style={{ gridColumn:"1/-1" }}>
+                    <label style={lbl}>Password (Doctor Login) {!editDoctor && "*"}</label>
+                    <input
+                      style={inp}
+                      type="password"
+                      placeholder={editDoctor ? "Leave blank to keep current password" : "Min 6 characters"}
+                      value={form.password}
+                      onChange={e=>setForm({...form,password:e.target.value})}
+                      required={!editDoctor}
+                      minLength={form.password ? 6 : undefined}
+                    />
+                  </div>
 
                   {/* Availability */}
                   <div style={{ gridColumn:"1/-1" }}>
