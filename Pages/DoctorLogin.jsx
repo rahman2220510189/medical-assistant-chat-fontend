@@ -393,16 +393,25 @@ export default function DoctorLogin() {
           <div className="dl-card">
 
             {/* Logo */}
-            <div className="dl-logo">
-              <div className="dl-logo-icon">
-                <RiHeartPulseLine />
-              </div>
-              <div>
-                <div className="dl-logo-text">MediAssist</div>
-                <div className="dl-logo-sub">Doctor Portal</div>
-              </div>
-            </div>
-
+            <div className="dl-sb-logo">
+  <div className="dl-sb-logo-icon"><RiHeartPulseLine /></div>
+  <div>
+    <div className="dl-sb-logo-name">
+      Medi<span style={{ color: "#ffffff", fontWeight: 800 }}>Care</span><span style={{ color: "#00d4ff", fontWeight: 800 }}>Plus</span>
+    </div>
+    <div className="dl-sb-logo-role">
+      <span style={{ 
+        display: "inline-block", 
+        width: 7, height: 7, 
+        borderRadius: "50%", 
+        background: "#22c55e",
+        boxShadow: "0 0 6px rgba(34,197,94,0.6)",
+        marginRight: 6 
+      }}></span>
+      Doctor Portal
+    </div>
+  </div>
+</div>
             {/* Badge */}
             <div className="dl-badge">
               <div className="dl-badge-dot" />

@@ -69,7 +69,10 @@ export function DoctorLayout() {
     navigate("/doctor/login");
   };
 
-  const isActive = (path) => location.pathname === path;
+  const isActive = (path) => {
+  if (path === "/doctor/dashboard") return location.pathname === "/doctor/dashboard";
+  return location.pathname.startsWith(path);
+};
 
   return (
     <>
@@ -241,13 +244,26 @@ export function DoctorLayout() {
         {/* Sidebar */}
         <div className={`dl-sidebar ${open ? "open" : ""}`}>
           {/* Logo */}
-          <div className="dl-sb-logo">
-            <div className="dl-sb-logo-icon"><RiHeartPulseLine /></div>
-            <div>
-              <div className="dl-sb-logo-name">MediAssist</div>
-              <div className="dl-sb-logo-role">Doctor Portal</div>
-            </div>
-          </div>
+            <div className="dl-sb-logo">
+  <div className="dl-sb-logo-icon"><RiHeartPulseLine /></div>
+  <div>
+    <div className="dl-sb-logo-name">
+      Medi<span style={{ color: "#ffffff", fontWeight: 800 }}>Care</span><span style={{ color: "#00d4ff", fontWeight: 800 }}>Plus</span>
+    </div>
+    <div className="dl-sb-logo-role">
+      <span style={{ 
+        display: "inline-block", 
+        width: 7, height: 7, 
+        borderRadius: "50%", 
+        background: "#22c55e",
+        boxShadow: "0 0 6px rgba(34,197,94,0.6)",
+        marginRight: 6 
+      }}></span>
+      Doctor Portal
+    </div>
+  </div>
+</div>
+        
 
           {/* Doctor info */}
           <div className="dl-sb-doctor">
