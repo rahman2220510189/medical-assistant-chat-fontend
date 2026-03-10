@@ -2,12 +2,106 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🩺</text></svg>" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>medical-assistant-chat-fontend</title>
+
+    <!-- SEO -->
+    <title>MediCarePlus — AI-Powered Healthcare Platform</title>
+    <meta name="description" content="Describe your symptoms, get instant AI diagnosis, and connect with verified doctors via video call. Healthcare reimagined." />
+    <meta name="keywords" content="telemedicine, AI diagnosis, doctor consultation, video call, prescription, healthcare Bangladesh" />
+    <meta name="author" content="MediCarePlus" />
+    <meta name="theme-color" content="#050d1a" />
+
+    <!-- Open Graph -->
+    <meta property="og:title" content="MediCarePlus — AI-Powered Healthcare" />
+    <meta property="og:description" content="Instant AI diagnosis + verified doctor video calls. Healthcare from your browser." />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://medicareplus.com" />
+
+    <!-- Fonts preload -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=DM+Sans:wght@300;400;500&family=Clash+Display:wght@600;700&family=Cabinet+Grotesk:wght@400;700;800&display=swap" rel="stylesheet" />
+
+    <style>
+      /* Loading screen */
+      #app-loader {
+        position: fixed; inset: 0; z-index: 9999;
+        background: #03070f;
+        display: flex; flex-direction: column;
+        align-items: center; justify-content: center;
+        gap: 20px;
+        transition: opacity 0.5s ease, visibility 0.5s ease;
+      }
+      #app-loader.hidden { opacity: 0; visibility: hidden; }
+
+      .loader-logo {
+        font-family: 'Syne', sans-serif;
+        font-size: 28px; font-weight: 800;
+        color: #f1f5f9; letter-spacing: -1px;
+      }
+      .loader-logo span { color: #00d4ff; }
+
+      .loader-bar {
+        width: 180px; height: 2px;
+        background: rgba(255,255,255,0.06);
+        border-radius: 2px; overflow: hidden;
+      }
+      .loader-bar-fill {
+        height: 100%; width: 0%;
+        background: linear-gradient(90deg, #00d4ff, #7c6fff);
+        border-radius: 2px;
+        animation: loadFill 1.2s ease forwards;
+      }
+      @keyframes loadFill { to { width: 100%; } }
+
+      .loader-text {
+        font-family: 'DM Sans', sans-serif;
+        font-size: 11px; color: #1e3347;
+        text-transform: uppercase; letter-spacing: 2px;
+      }
+
+      /* Base reset */
+      *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+      html { scroll-behavior: smooth; }
+      body {
+        background: #03070f;
+        color: #e8f0fe;
+        font-family: 'DM Sans', sans-serif;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+        overflow-x: hidden;
+      }
+
+      /* Scrollbar */
+      ::-webkit-scrollbar { width: 6px; }
+      ::-webkit-scrollbar-track { background: #03070f; }
+      ::-webkit-scrollbar-thumb { background: rgba(0,212,255,0.2); border-radius: 3px; }
+      ::-webkit-scrollbar-thumb:hover { background: rgba(0,212,255,0.4); }
+
+      /* Selection */
+      ::selection { background: rgba(0,212,255,0.2); color: #00d4ff; }
+    </style>
   </head>
   <body>
+
+    <!-- Loading screen -->
+    <div id="app-loader">
+      <div class="loader-logo">Medi<span>Care</span>Plus</div>
+      <div class="loader-bar"><div class="loader-bar-fill"></div></div>
+      <div class="loader-text">Loading...</div>
+    </div>
+
     <div id="root"></div>
     <script type="module" src="/src/main.jsx"></script>
+
+    <script>
+      window.addEventListener("load", () => {
+        setTimeout(() => {
+          const loader = document.getElementById("app-loader");
+          if (loader) loader.classList.add("hidden");
+        }, 1300);
+      });
+    </script>
   </body>
 </html>

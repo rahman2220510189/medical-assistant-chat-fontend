@@ -1,7 +1,9 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useContext } from 'react';
 import { Send, Loader, AlertCircle, Activity, Pill, ShieldAlert, User, Bot } from 'lucide-react';
-
+import { AuthContext } from '../Provider/AuthProvider';
+const API = import.meta.env.VITE_API_URL || "http://localhost:5000";
 const MedicalChatbot = () => {
+  const { user } = useContext(AuthContext);
   const [messages, setMessages] = useState([
     {
       type: 'bot',
@@ -35,7 +37,7 @@ const MedicalChatbot = () => {
 
     try {
       // Call your Node.js backend
-      const response = await fetch('http://localhost:5000/api/chat', {
+      const response = await fetch(`${API}/api/chat`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -174,11 +176,7 @@ const MedicalChatbot = () => {
               key={index}
               className={`flex gap-3 ${message.type === 'user' ? 'justify-end' : 'justify-start'}`}
             >
-              {message.type === 'bot' && (
-                <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-full flex items-center justify-center flex-shrink-0">
-                  <Bot className="w-5 h-5 text-white" />
-                </div>
-              )}
+        
               
               <div
                 className={`max-w-3xl rounded-2xl px-4 py-3 ${
@@ -195,11 +193,17 @@ const MedicalChatbot = () => {
                 </div>
               </div>
 
-              {message.type === 'user' && (
-                <div className="w-8 h-8 bg-gradient-to-br from-gray-400 to-gray-600 rounded-full flex items-center justify-center flex-shrink-0">
-                  <User className="w-5 h-5 text-white" />
-                </div>
-              )}
+             
+                   {message.type === 'user' && (
+  <div className="w-8 h-8 rounded-full flex-shrink-0 overflow-hidden">
+    {user?.photoURL
+      ? <img src={user.photoURL} alt="user" className="w-full h-full object-cover" />
+      : <div className="w-full h-full bg-gradient-to-br from-gray-400 to-gray-600 flex items-center justify-center">
+          <User className="w-5 h-5 text-white" />
+        </div>
+    }
+  </div>
+)} 
             </div>
           ))}
 
@@ -230,8 +234,8 @@ const MedicalChatbot = () => {
               onChange={(e) => setInput(e.target.value)}
               onKeyPress={handleKeyPress}
               placeholder="Describe your symptoms... (e.g., 'I have fever and headache')"
-              className="flex-1 resize-none border border-gray-300 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               rows="2"
+              className="flex-1 resize-none border border-gray-300 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900"
               disabled={loading}
             />
             <button
