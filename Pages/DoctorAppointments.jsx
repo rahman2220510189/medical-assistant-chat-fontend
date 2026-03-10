@@ -199,11 +199,14 @@ export default function DoctorAppointments() {
                       </span>
                     </td>
                     <td className="da-td">
-                      {apt.status === "Confirmed" && apt.callRoomId && (
-                        <button className="da-join-btn" onClick={() => navigate(`/doctor/call/${apt._id}`)}>
-                          Join Call
-                        </button>
-                      )}
+                       {(apt.status === "Confirmed" || apt.status === "Completed") && (
+    <button className="da-join-btn"
+      style={{ background: "linear-gradient(135deg, #7c3aed, #6d28d9)" }}
+      onClick={() => navigate(`/doctor/prescription/${apt._id}`)}>
+      📋 Prescription
+    </button>
+  )}
+
                     </td>
                   </tr>
                 );

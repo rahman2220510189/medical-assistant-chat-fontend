@@ -544,15 +544,15 @@ export default function Appointments() {
                       )}
 
                       {/* Completed → Prescription */}
-                      {appt.status === "Completed" && (
-                        <button
-                          className="action-btn btn-prescription"
-                          style={{ border: "none" }}
-                          onClick={() => navigate(`/prescription/${appt._id}`)}
-                        >
-                          <FiFileText /> Prescription
-                        </button>
-                      )}
+                     {(appt.status === "Confirmed" || appt.status === "Completed") && (
+  <button
+    className="action-btn btn-prescription"
+    style={{ border: "none" }}
+    onClick={() => navigate(`/prescription/${appt._id}`)}
+  >
+    <FiFileText /> Prescription
+  </button>
+)}
                     </div>
                   </div>
 

@@ -28,6 +28,7 @@ import DoctorDashboard, { DoctorLayout, DoctorRoute } from '../../Pages/DoctorDa
 import DoctorAppointments from '../../Pages/DoctorAppointments'
 import DoctorProfile from '../../Pages/DoctorProfil'
 import VideoCall from '../../Pages/VideoCall'
+import Prescription from '../../Pages/Prescription'
 
 export const router = createBrowserRouter([
     // ── PUBLIC ROUTES ──
@@ -67,6 +68,8 @@ export const router = createBrowserRouter([
                 path: "/doctor/login",
                 element:<DoctorLogin></DoctorLogin>
             },
+            { path: "/prescription/:appointmentId",
+            element: <PrivateRoute><Prescription /></PrivateRoute> },
            
         ],
     },
@@ -87,7 +90,8 @@ export const router = createBrowserRouter([
             {
                 path:"profile",
                 element:<DoctorProfile></DoctorProfile>
-            }
+            },
+           
         ]
      },
 
@@ -127,4 +131,8 @@ export const router = createBrowserRouter([
         path: '/doctor/call/:appointmentId',
         element: <DoctorRoute><VideoCall></VideoCall></DoctorRoute>
     },
+     {
+                path:"/doctor/prescription/:appointmentId",
+                element:<DoctorRoute><Prescription></Prescription></DoctorRoute>
+            }
 ])
