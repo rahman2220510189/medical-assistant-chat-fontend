@@ -521,89 +521,90 @@ export default function Home() {
       <div className="hm">
 
         {/* ── HERO ── */}
-        <section className="hm-hero">
-          <canvas ref={canvasRef} className="hm-canvas" />
+      <section className="hm-hero" style={{ minHeight: "100vh", position: "relative", overflow: "hidden", padding: "80px 20px" }}>
+          <canvas ref={canvasRef} className="hm-canvas" style={{ position: "absolute", top: 0, left: 0, width: "100%", height: "100%", pointerEvents: "none" }} />
           <div className="hm-orbs">
-            <Orb style={{ width:700,height:700,background:"radial-gradient(circle,rgba(0,212,255,0.08),transparent)",top:-200,left:-200, transform:`translate(${parallaxX*0.5}px,${parallaxY*0.5}px)` }} />
-            <Orb style={{ width:600,height:600,background:"radial-gradient(circle,rgba(124,111,255,0.08),transparent)",bottom:-150,right:-150, transform:`translate(${-parallaxX*0.4}px,${-parallaxY*0.4}px)` }} />
-            <Orb style={{ width:400,height:400,background:"radial-gradient(circle,rgba(245,158,11,0.06),transparent)",top:"40%",left:"40%", transform:`translate(${parallaxX*0.3}px,${parallaxY*0.3}px)` }} />
+            <Orb style={{ width: "min(700px, 90vw)", height: "min(700px, 90vw)", background: "radial-gradient(circle,rgba(0,212,255,0.08),transparent)", top: -200, left: -200, transform: `translate(${parallaxX * 0.5}px,${parallaxY * 0.5}px)` }} />
+            <Orb style={{ width: "min(600px, 80vw)", height: "min(600px, 80vw)", background: "radial-gradient(circle,rgba(124,111,255,0.08),transparent)", bottom: -150, right: -150, transform: `translate(${-parallaxX * 0.4}px,${-parallaxY * 0.4}px)` }} />
+            <Orb style={{ width: "min(400px, 60vw)", height: "min(400px, 60vw)", background: "radial-gradient(circle,rgba(245,158,11,0.06),transparent)", top: "40%", left: "40%", transform: `translate(${parallaxX * 0.3}px,${parallaxY * 0.3}px)` }} />
           </div>
           <div className="hm-aurora" />
           <div className="hm-scanlines" />
 
           {/* Floating status cards */}
-          <div className="hm-float-cards">
-            <div className="hm-float hm-float-1">
+          <div className="hm-float-cards" style={{ display: "flex", flexWrap: "wrap", justifyContent: "center", gap: "10px", marginBottom: "30px", position: "relative", zIndex: 10 }}>
+            <div className="hm-float hm-float-1" style={{ padding: "10px 15px", borderRadius: "12px", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", backdropFilter: "blur(10px)" }}>
               <div className="hm-float-icon">🤖</div>
-              <div className="hm-float-label">AI Accuracy</div>
-              <div className="hm-float-val" style={{color:"#00d4ff"}}>99%</div>
+              <div className="hm-float-label" style={{ fontSize: "12px" }}>AI Accuracy</div>
+              <div className="hm-float-val" style={{ color: "#00d4ff", fontWeight: "bold" }}>99%</div>
             </div>
-            <div className="hm-float hm-float-2">
+            <div className="hm-float hm-float-2" style={{ padding: "10px 15px", borderRadius: "12px", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", backdropFilter: "blur(10px)" }}>
               <div className="hm-float-icon">⚡</div>
-              <div className="hm-float-label">Diagnosis Time</div>
-              <div className="hm-float-val" style={{color:"#f59e0b"}}>&lt;3 sec</div>
+              <div className="hm-float-label" style={{ fontSize: "12px" }}>Diagnosis Time</div>
+              <div className="hm-float-val" style={{ color: "#f59e0b", fontWeight: "bold" }}>&lt;3 sec</div>
             </div>
-            <div className="hm-float hm-float-3">
+            <div className="hm-float hm-float-3" style={{ padding: "10px 15px", borderRadius: "12px", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", backdropFilter: "blur(10px)" }}>
               <div className="hm-float-icon">👨‍⚕️</div>
-              <div className="hm-float-label">Verified Doctors</div>
-              <div className="hm-float-val" style={{color:"#a78bfa"}}>12+</div>
+              <div className="hm-float-label" style={{ fontSize: "12px" }}>Verified Doctors</div>
+              <div className="hm-float-val" style={{ color: "#a78bfa", fontWeight: "bold" }}>12+</div>
             </div>
-            <div className="hm-float hm-float-4">
-              <div style={{display:"flex",alignItems:"center",gap:6,marginBottom:4}}>
-                <div style={{width:8,height:8,borderRadius:"50%",background:"#22c55e",boxShadow:"0 0 8px #22c55e"}} />
-                <span style={{fontSize:10,color:"#22c55e",fontWeight:700,textTransform:"uppercase",letterSpacing:1}}>Live Now</span>
+            <div className="hm-float hm-float-4" style={{ padding: "10px 15px", borderRadius: "12px", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", backdropFilter: "blur(10px)" }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 4 }}>
+                <div style={{ width: 8, height: 8, borderRadius: "50%", background: "#22c55e", boxShadow: "0 0 8px #22c55e" }} />
+                <span style={{ fontSize: 10, color: "#22c55e", fontWeight: 700, textTransform: "uppercase", letterSpacing: 1 }}>Live Now</span>
               </div>
-              <div className="hm-float-val">3 Consultations</div>
+              <div className="hm-float-val" style={{ fontSize: "14px" }}>3 Consultations</div>
             </div>
           </div>
 
-          <div className="hm-hero-inner">
-            <div className="hm-eyebrow">
+          <div className="hm-hero-inner" style={{ maxWidth: "1000px", margin: "0 auto", textAlign: "center", position: "relative", zIndex: 5 }}>
+            <div className="hm-eyebrow" style={{ display: "inline-flex", alignItems: "center", gap: "8px", padding: "6px 16px", borderRadius: "100px", background: "rgba(255,255,255,0.05)", fontSize: "13px", marginBottom: "20px" }}>
               <div className="hm-eyebrow-pulse" />
               AI-Powered Healthcare Platform
             </div>
 
-            <h1 className="hm-h1">
-              <span className="hm-h1-line1">Healthcare</span>
-              <span className="hm-h1-line2">Reimagined.</span>
+            <h1 className="hm-h1" style={{ fontSize: "clamp(2.5rem, 8vw, 5rem)", fontWeight: 800, lineHeight: 1.1, marginBottom: "20px" }}>
+              <span className="hm-h1-line1" style={{ display: "block" }}>Healthcare</span>
+              <span className="hm-h1-line2" style={{ display: "block", color: "#a78bfa" }}>Reimagined.</span>
             </h1>
 
-            <div className="hm-typed-line">
+            <div className="hm-typed-line" style={{ fontSize: "clamp(1rem, 4vw, 1.5rem)", height: "1.5em", marginBottom: "20px" }}>
               {typed}<span className="hm-cursor" />
             </div>
 
-            <p className="hm-sub">
+            <p className="hm-sub" style={{ fontSize: "clamp(1rem, 3.5vw, 1.2rem)", maxWidth: "600px", margin: "0 auto 40px", opacity: 0.8 }}>
               Describe your symptoms. Get an instant AI diagnosis. Connect with verified specialists via video call — all from your browser.
             </p>
 
-            <div className="hm-hero-btns">
-              <button className="hm-btn-primary" onClick={() => navigate("/chatbot")}>
+            <div className="hm-hero-btns" style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "15px", width: "100%", maxWidth: "400px", margin: "0 auto" }}>
+              <button className="hm-btn-primary" style={{ width: "100%", padding: "16px 32px", borderRadius: "12px", border: "none", background: "#fff", color: "#000", fontWeight: "bold", cursor: "pointer" }} onClick={() => navigate("/chatbot")}>
                 ✨ Try AI Diagnosis Free
               </button>
-              <button className="hm-btn-ghost" onClick={() => navigate("/doctors")}>
+              <button className="hm-btn-ghost" style={{ width: "100%", padding: "16px 32px", borderRadius: "12px", border: "1px solid rgba(255,255,255,0.2)", background: "transparent", color: "#fff", cursor: "pointer" }} onClick={() => navigate("/doctors")}>
                 Browse Doctors →
               </button>
             </div>
 
             {/* Quick check bar */}
-            <div className="hm-quick">
-              <div className="hm-quick-bar">
+            <div className="hm-quick" style={{ marginTop: "50px", width: "100%", maxWidth: "600px", margin: "50px auto 0" }}>
+              <div className="hm-quick-bar" style={{ display: "flex", background: "rgba(255,255,255,0.05)", padding: "6px", borderRadius: "14px", border: "1px solid rgba(255,255,255,0.1)", flexWrap: "wrap" }}>
                 <input
                   className="hm-quick-inp"
-                  placeholder="Describe a symptom quickly... e.g. 'I have a headache and fever'"
+                  style={{ flex: "1", minWidth: "200px", background: "transparent", border: "none", color: "#fff", padding: "12px 15px", outline: "none" }}
+                  placeholder="Describe a symptom quickly..."
                   value={symptom}
                   onChange={e => setSymptom(e.target.value)}
                   onKeyDown={e => e.key === "Enter" && navigate("/chatbot")}
                 />
-                <button className="hm-quick-btn" onClick={() => navigate("/chatbot")}>
+                <button className="hm-quick-btn" style={{ width: "100%", smWidth: "auto", background: "#a78bfa", color: "#fff", border: "none", padding: "12px 24px", borderRadius: "10px", fontWeight: "bold", cursor: "pointer" }} onClick={() => navigate("/chatbot")}>
                   Check Now →
                 </button>
               </div>
-              <div style={{fontSize:11,color:"#1e3347",marginTop:10,textAlign:"center"}}>
+              <div style={{ fontSize: 11, color: "#94a3b8", marginTop: 15, textAlign: "center" }}>
                 Free • No account needed • Instant results
               </div>
             </div>
-          </div>
+          </div>  
         </section>
 
         {/* ── STATS ── */}
