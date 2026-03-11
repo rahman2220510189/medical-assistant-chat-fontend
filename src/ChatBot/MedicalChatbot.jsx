@@ -2,6 +2,8 @@ import React, { useState, useRef, useEffect, useContext } from 'react';
 import { Send, Loader, AlertCircle, Activity, Pill, ShieldAlert, User, Bot } from 'lucide-react';
 import { AuthContext } from '../Provider/AuthProvider';
 const API = import.meta.env.VITE_API_URL || "http://localhost:5000";
+
+
 const MedicalChatbot = () => {
   const { user } = useContext(AuthContext);
   const [messages, setMessages] = useState([

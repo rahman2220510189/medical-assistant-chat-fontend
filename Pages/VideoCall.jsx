@@ -15,6 +15,18 @@ const ICE_SERVERS = {
   iceServers: [
     { urls: "stun:stun.l.google.com:19302" },
     { urls: "stun:stun1.l.google.com:19302" },
+    { urls: "stun:stun2.l.google.com:19302" },
+    { urls: "stun:stun3.l.google.com:19302" },
+    {
+      urls: "turn:openrelay.metered.ca:80",
+      username: "openrelayproject",
+      credential: "openrelayproject",
+    },
+    {
+      urls: "turn:openrelay.metered.ca:443",
+      username: "openrelayproject",
+      credential: "openrelayproject",
+    },
   ]
 };
 
@@ -35,6 +47,7 @@ export default function VideoCall() {
   const localStreamRef = useRef(null);
   const chatEndRef     = useRef(null);
   const imgRef         = useRef(null);
+  const roomIdRef      = useRef(null);
 
   const [appointment, setAppointment]   = useState(null);
   const [loading, setLoading]           = useState(true);
@@ -50,6 +63,7 @@ export default function VideoCall() {
   const [callEnded, setCallEnded]       = useState(false);
   const [userName, setUserName]         = useState("");
   const [error, setError]               = useState("");
+  const [incomingCall, setIncomingCall] = useState(null);
 
   useEffect(() => {
     const load = async () => {
@@ -63,6 +77,7 @@ export default function VideoCall() {
           ? (doctorInfo.name || "Doctor")
           : (apt.patientName || "Patient");
         setUserName(name);
+        roomIdRef.current = apt.callRoomId;
         initCall(apt.callRoomId, name);
       } catch {
         setError("Appointment not found or access denied.");
@@ -79,6 +94,50 @@ export default function VideoCall() {
     socketRef.current?.disconnect();
   };
 
+  const createPeerConnection = (socket, roomId) => {
+    // Close existing PC if any
+    if (pcRef.current) pcRef.current.close();
+
+    const pc = new RTCPeerConnection(ICE_SERVERS);
+    pcRef.current = pc;
+
+    // Add local tracks
+    localStreamRef.current?.getTracks().forEach(track => {
+      pc.addTrack(track, localStreamRef.current);
+    });
+
+    // Remote stream
+    pc.ontrack = (e) => {
+      console.log("Remote track received:", e.streams[0]);
+      if (remoteVideoRef.current && e.streams[0]) {
+        remoteVideoRef.current.srcObject = e.streams[0];
+        setRemoteJoined(true);
+      }
+    };
+
+    // ICE candidates
+    pc.onicecandidate = (e) => {
+      if (e.candidate) {
+        socket.emit("ice-candidate", { roomId, candidate: e.candidate });
+      }
+    };
+
+    pc.oniceconnectionstatechange = () => {
+      console.log("ICE state:", pc.iceConnectionState);
+      if (pc.iceConnectionState === "connected" || pc.iceConnectionState === "completed") {
+        setConnected(true);
+      }
+    };
+
+    pc.onconnectionstatechange = () => {
+      console.log("Connection state:", pc.connectionState);
+      if (pc.connectionState === "connected") setConnected(true);
+      if (["disconnected", "failed"].includes(pc.connectionState)) setCallEnded(true);
+    };
+
+    return pc;
+  };
+
   const initCall = async (roomId, name) => {
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
@@ -88,57 +147,80 @@ export default function VideoCall() {
       const socket = io(SOCKET, { transports: ["websocket"] });
       socketRef.current = socket;
 
-      const pc = new RTCPeerConnection(ICE_SERVERS);
-      pcRef.current = pc;
-
-      stream.getTracks().forEach(track => pc.addTrack(track, stream));
-
-      pc.ontrack = (e) => {
-        if (remoteVideoRef.current) remoteVideoRef.current.srcObject = e.streams[0];
-      };
-
-      pc.onicecandidate = (e) => {
-        if (e.candidate) socket.emit("ice-candidate", { roomId, candidate: e.candidate });
-      };
-
-      pc.onconnectionstatechange = () => {
-        if (pc.connectionState === "connected") setConnected(true);
-        if (["disconnected","failed"].includes(pc.connectionState)) setCallEnded(true);
-      };
-
       socket.on("connect", () => {
+        console.log("Socket connected, role:", role);
         socket.emit("join-room", { roomId, role, userName: name });
         setLoading(false);
       });
 
-      socket.on("user-joined", async () => {
+      // When another user joins the room
+      socket.on("user-joined", async ({ role: joinedRole, userName: joinedName }) => {
+        console.log("User joined:", joinedRole, joinedName);
         setRemoteJoined(true);
+
+        // Doctor always creates offer when patient joins
         if (role === "doctor") {
-          const offer = await pc.createOffer();
+          const pc = createPeerConnection(socket, roomId);
+          const offer = await pc.createOffer({
+            offerToReceiveAudio: true,
+            offerToReceiveVideo: true,
+          });
           await pc.setLocalDescription(offer);
           socket.emit("offer", { roomId, offer });
+          console.log("Offer sent");
         }
       });
 
+      // Patient receives offer from doctor
       socket.on("offer", async ({ offer }) => {
         if (!offer) return;
+        console.log("Offer received, role:", role);
+        setRemoteJoined(true);
+
+        const pc = createPeerConnection(socket, roomId);
         await pc.setRemoteDescription(new RTCSessionDescription(offer));
         const answer = await pc.createAnswer();
         await pc.setLocalDescription(answer);
         socket.emit("answer", { roomId, answer });
+        console.log("Answer sent");
       });
 
+      // Doctor receives answer from patient
       socket.on("answer", async ({ answer }) => {
-        if (!answer) return;
-        await pc.setRemoteDescription(new RTCSessionDescription(answer));
+        if (!answer || !pcRef.current) return;
+        console.log("Answer received");
+        await pcRef.current.setRemoteDescription(new RTCSessionDescription(answer));
       });
 
       socket.on("ice-candidate", async ({ candidate }) => {
-        if (!candidate) return;
-        try { await pc.addIceCandidate(new RTCIceCandidate(candidate)); } catch {}
+        if (!candidate || !pcRef.current) return;
+        try {
+          await pcRef.current.addIceCandidate(new RTCIceCandidate(candidate));
+        } catch (e) {
+          console.error("ICE error:", e);
+        }
       });
 
-      // ✅ image support যোগ হয়েছে
+      // Incoming call notification
+      socket.on("incoming-call", ({ doctorName }) => {
+        setIncomingCall({ doctorName });
+        if (Notification.permission === "granted") {
+          new Notification("Incoming Call", {
+            body: `Dr. ${doctorName} is calling you`,
+            icon: "/favicon.ico",
+          });
+        } else if (Notification.permission !== "denied") {
+          Notification.requestPermission().then(perm => {
+            if (perm === "granted") {
+              new Notification("Incoming Call", {
+                body: `Dr. ${doctorName} is calling you`,
+                icon: "/favicon.ico",
+              });
+            }
+          });
+        }
+      });
+
       socket.on("chat-message", ({ message, sender, time, image }) => {
         setMessages(prev => [...prev, { message, sender, time, image }]);
         setUnread(u => u + 1);
@@ -146,7 +228,8 @@ export default function VideoCall() {
 
       socket.on("call-ended", () => setCallEnded(true));
 
-    } catch {
+    } catch (err) {
+      console.error("initCall error:", err);
       setError("Camera/Mic access denied. Please allow permissions.");
       setLoading(false);
     }
@@ -163,12 +246,11 @@ export default function VideoCall() {
   };
 
   const endCall = () => {
-    socketRef.current?.emit("end-call", { roomId: appointment?.callRoomId });
+    socketRef.current?.emit("end-call", { roomId: roomIdRef.current });
     cleanup();
     setCallEnded(true);
   };
 
-  // ✅ image send support
   const sendMessage = () => {
     if (!msgInput.trim() && !imageFile) return;
 
@@ -181,7 +263,7 @@ export default function VideoCall() {
           sender: userName,
           time: new Date().toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" })
         };
-        socketRef.current?.emit("chat-message", { roomId: appointment?.callRoomId, ...msg });
+        socketRef.current?.emit("chat-message", { roomId: roomIdRef.current, ...msg });
         setMessages(prev => [...prev, msg]);
         setMsgInput(""); setImageFile(null);
       };
@@ -192,7 +274,7 @@ export default function VideoCall() {
         sender: userName,
         time: new Date().toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" })
       };
-      socketRef.current?.emit("chat-message", { roomId: appointment?.callRoomId, ...msg });
+      socketRef.current?.emit("chat-message", { roomId: roomIdRef.current, ...msg });
       setMessages(prev => [...prev, msg]);
       setMsgInput("");
     }
@@ -293,6 +375,13 @@ export default function VideoCall() {
         @keyframes spin { to { transform: rotate(360deg); } }
         .vc-loading-text { font-size: 16px; font-weight: 700; color: #f1f5f9; }
         .vc-loading-sub { font-size: 12px; color: #475569; }
+        .vc-incoming { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); z-index: 200; background: #0f2540; border: 1px solid rgba(0,212,255,0.3); border-radius: 20px; padding: 20px 28px; display: flex; flex-direction: column; align-items: center; gap: 12px; box-shadow: 0 8px 40px rgba(0,0,0,0.6); min-width: 280px; animation: slideDown 0.3s ease; }
+        @keyframes slideDown { from { opacity:0; transform: translateX(-50%) translateY(-20px); } to { opacity:1; transform: translateX(-50%) translateY(0); } }
+        .vc-incoming-title { font-size: 13px; color: #64748b; font-weight: 600; }
+        .vc-incoming-name { font-size: 18px; color: #f1f5f9; font-weight: 800; }
+        .vc-incoming-btns { display: flex; gap: 12px; margin-top: 4px; }
+        .vc-incoming-accept { padding: 10px 24px; background: #22c55e; border: none; border-radius: 12px; color: white; font-weight: 700; font-size: 14px; cursor: pointer; }
+        .vc-incoming-decline { padding: 10px 24px; background: #ef4444; border: none; border-radius: 12px; color: white; font-weight: 700; font-size: 14px; cursor: pointer; }
         @media(max-width:768px) { .vc-local { width: 120px; height: 80px; } .vc-chat { width: 100%; } }
       `}</style>
 
@@ -305,8 +394,18 @@ export default function VideoCall() {
         </div>
       )}
 
+      {incomingCall && (
+        <div className="vc-incoming">
+          <div className="vc-incoming-title">📞 Incoming Call</div>
+          <div className="vc-incoming-name">Dr. {incomingCall.doctorName}</div>
+          <div className="vc-incoming-btns">
+            <button className="vc-incoming-accept" onClick={() => setIncomingCall(null)}>Accept</button>
+            <button className="vc-incoming-decline" onClick={() => { setIncomingCall(null); navigate("/appointments"); }}>Decline</button>
+          </div>
+        </div>
+      )}
+
       <div className="vc-root">
-        {/* Header */}
         <div className="vc-header">
           <div className="vc-logo">
             <RiHeartPulseLine />
@@ -322,26 +421,28 @@ export default function VideoCall() {
           </div>
         </div>
 
-        {/* Video */}
         <div className="vc-videos">
-          {remoteJoined
-            ? <video ref={remoteVideoRef} className="vc-remote" autoPlay playsInline />
-            : (
-              <div className="vc-remote-placeholder">
-                <div className="vc-remote-placeholder-icon">👨‍⚕️</div>
-                <div className="vc-remote-placeholder-text">
-                  {role === "doctor" ? "Waiting for patient..." : "Waiting for doctor..."}
-                </div>
+          <video
+            ref={remoteVideoRef}
+            className="vc-remote"
+            autoPlay
+            playsInline
+            style={{ display: remoteJoined ? "block" : "none" }}
+          />
+          {!remoteJoined && (
+            <div className="vc-remote-placeholder">
+              <div className="vc-remote-placeholder-icon">👨‍⚕️</div>
+              <div className="vc-remote-placeholder-text">
+                {role === "doctor" ? "Waiting for patient..." : "Waiting for doctor..."}
               </div>
-            )
-          }
+            </div>
+          )}
           <div className="vc-local">
             <video ref={localVideoRef} autoPlay playsInline muted />
             <div className="vc-local-label">You</div>
           </div>
         </div>
 
-        {/* Controls */}
         <div className="vc-controls">
           <button className={`vc-btn ${micOn ? "on" : "off"}`} onClick={toggleMic}>
             {micOn ? <FiMic /> : <FiMicOff />}
@@ -359,13 +460,11 @@ export default function VideoCall() {
         </div>
       </div>
 
-      {/* Chat Sidebar */}
       <div className={`vc-chat ${showChat ? "open" : ""}`}>
         <div className="vc-chat-header">
           <span>Chat</span>
           <button className="vc-chat-close" onClick={() => setShowChat(false)}><FiX /></button>
         </div>
-
         <div className="vc-chat-msgs">
           {messages.length === 0 && (
             <div style={{ textAlign: "center", color: "#334155", fontSize: 12, marginTop: 40 }}>
@@ -375,7 +474,6 @@ export default function VideoCall() {
           {messages.map((m, i) => (
             <div key={i} className={`vc-msg ${m.sender === userName ? "mine" : "theirs"}`}>
               {m.sender !== userName && <div className="vc-msg-sender">{m.sender}</div>}
-              {/* ✅ Image support */}
               {m.image && (
                 <img
                   src={m.image}
@@ -390,8 +488,6 @@ export default function VideoCall() {
           ))}
           <div ref={chatEndRef} />
         </div>
-
-        {/* ✅ Chat input with image button */}
         <div className="vc-chat-input">
           {imageFile && (
             <div style={{ position: "relative", display: "inline-block" }}>
@@ -410,13 +506,7 @@ export default function VideoCall() {
             <button className="vc-img-btn" onClick={() => imgRef.current.click()} title="Send image">
               <FiImage />
             </button>
-            <input
-              ref={imgRef}
-              type="file"
-              accept="image/*"
-              style={{ display: "none" }}
-              onChange={e => setImageFile(e.target.files[0])}
-            />
+            <input ref={imgRef} type="file" accept="image/*" style={{ display: "none" }} onChange={e => setImageFile(e.target.files[0])} />
             <input
               className="vc-chat-inp"
               placeholder="Type a message..."
