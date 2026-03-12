@@ -357,22 +357,39 @@ export default function DoctorDashboard() {
   const token  = getDoctorToken();
   const navigate = useNavigate();
 
+  // ── Helper: check if a date is today ──
+  const isToday = (dateStr) => {
+    const d = new Date(dateStr);
+    const t = new Date();
+    return d.getDate()     === t.getDate()     &&
+           d.getMonth()    === t.getMonth()    &&
+           d.getFullYear() === t.getFullYear();
+  };
+
+  const fetchData = async () => {
+    try {
+      const [statsRes, apptRes] = await Promise.all([
+        axios.get(`${API}/api/doctor/stats`, { headers: { Authorization: `Bearer ${token}` } }),
+        axios.get(`${API}/api/doctor/appointments`, { headers: { Authorization: `Bearer ${token}` } }),
+      ]);
+      setStats(statsRes.data.stats);
+
+      const all = apptRes.data.appointments || [];
+      // Today's Confirmed আগে দেখাও, বাকিগুলো পরে
+      const todayConfirmed = all.filter(a => a.status === "Confirmed" && isToday(a.appointmentDate));
+      const rest           = all.filter(a => !(a.status === "Confirmed" && isToday(a.appointmentDate)));
+      setAppointments([...todayConfirmed, ...rest].slice(0, 8));
+    } catch (e) {
+      if (e.response?.status === 403) navigate("/doctor/login");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const [statsRes, apptRes] = await Promise.all([
-          axios.get(`${API}/api/doctor/stats`, { headers: { Authorization: `Bearer ${token}` } }),
-          axios.get(`${API}/api/doctor/appointments`, { headers: { Authorization: `Bearer ${token}` } }),
-        ]);
-        setStats(statsRes.data.stats);
-        setAppointments(apptRes.data.appointments?.slice(0, 5) || []);
-      } catch (e) {
-        if (e.response?.status === 403) navigate("/doctor/login");
-      } finally {
-        setLoading(false);
-      }
-    };
     fetchData();
+    const interval = setInterval(fetchData, 30000); // 30 sec auto refetch
+    return () => clearInterval(interval);
   }, []);
 
   const STAT_CARDS = stats ? [
@@ -449,6 +466,22 @@ export default function DoctorDashboard() {
           transition: all 0.2s;
         }
         .dd-join-btn:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(0,212,255,0.3); }
+
+        .dd-rx-btn {
+          padding: 5px 12px; border-radius: 8px; border: none;
+          background: linear-gradient(135deg, #7c3aed, #6d28d9);
+          color: white; font-size: 11px; font-weight: 700;
+          cursor: pointer; font-family: 'Cabinet Grotesk', sans-serif;
+          transition: all 0.2s; margin-left: 6px;
+        }
+        .dd-rx-btn:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(124,58,237,0.3); }
+
+        .dd-today-badge {
+          display: inline-block; padding: 2px 7px; border-radius: 6px;
+          background: rgba(34,197,94,0.1); color: #22c55e;
+          font-size: 9px; font-weight: 700; text-transform: uppercase;
+          letter-spacing: 0.5px; margin-left: 6px;
+        }
       `}</style>
 
       {/* Greeting */}
@@ -495,9 +528,16 @@ export default function DoctorDashboard() {
             <tbody>
               {appointments.map(apt => {
                 const sc = STATUS_COLORS[apt.status] || STATUS_COLORS.Pending;
+                const todayAndConfirmed = apt.status === "Confirmed" && isToday(apt.appointmentDate);
+                const canRx = (apt.status === "Confirmed" || apt.status === "Completed") && isToday(apt.appointmentDate);
                 return (
                   <tr key={apt._id} className="dd-tr">
-                    <td className="dd-td"><span className="dd-patient-name">{apt.patientName || "—"}</span><br /><span style={{ fontSize: 11, color: "#334155" }}>{apt.patientPhone}</span></td>
+                    <td className="dd-td">
+                      <span className="dd-patient-name">{apt.patientName || "—"}</span>
+                      {todayAndConfirmed && <span className="dd-today-badge">Today</span>}
+                      <br />
+                      <span style={{ fontSize: 11, color: "#334155" }}>{apt.patientPhone}</span>
+                    </td>
                     <td className="dd-td">{formatDate(apt.appointmentDate)}</td>
                     <td className="dd-td">{apt.appointmentTime}</td>
                     <td className="dd-td">
@@ -506,9 +546,14 @@ export default function DoctorDashboard() {
                       </span>
                     </td>
                     <td className="dd-td">
-                      {apt.status === "Confirmed" && apt.callRoomId && (
+                      {todayAndConfirmed && apt.callRoomId && (
                         <button className="dd-join-btn" onClick={() => navigate(`/doctor/call/${apt._id}`)}>
                           Join Call
+                        </button>
+                      )}
+                      {canRx && (
+                        <button className="dd-rx-btn" onClick={() => navigate(`/doctor/prescription/${apt._id}`)}>
+                          Prescription
                         </button>
                       )}
                     </td>
