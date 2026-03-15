@@ -61,7 +61,7 @@ MediCare Plus bridges the gap between patients and doctors using AI. Patients de
 
 ## 🚀 Live Demo
 
-🌐 **Live:** [https://medical-assistant-chat-fontend-wkzu.vercel.app](https://medical-assistant-chat-fontend-wkzu.vercel.app)
+🌐 **Live:** [https://medical-assistant-chat-fontend.vercel.app](https://medical-assistant-chat-fontend.vercel.app)
 
 🎥 **Demo Video:** [Watch on Google Drive](https://drive.google.com/file/d/1T_a3GU62vFl7LXAtQPwTtLsNQeFHzYHz/view?usp=drive_link)
 
@@ -100,7 +100,7 @@ cp .env.example .env
 Add these to your `.env` file:
 
 ```env
-VITE_API_URL=https://medical-assistant-backend-og0t.onrender.com
+VITE_API_URL=https://medical-assistant-backend-1.onrender.com
 VITE_STRIPE_PUBLISHABLE_KEY=your_stripe_key
 VITE_FIREBASE_API_KEY=your_firebase_key
 VITE_FIREBASE_AUTH_DOMAIN=your_project.firebaseapp.com
